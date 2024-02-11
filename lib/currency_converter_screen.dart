@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'currency_service.dart';
 
 class CurrencyConverterScreen extends StatefulWidget {
   @override
@@ -8,18 +9,17 @@ class CurrencyConverterScreen extends StatefulWidget {
 
 class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   String _amount = '';
-  String _selectedCurrencyFrom = 'USD'; // Default "From" currency set to USD
-  String _selectedCurrencyTo = 'USD'; // Default "To" currency set to USD
+  String _selectedCurrencyFrom = 'USD';
+  String _selectedCurrencyTo = 'USD';
   String _conversionResult = '';
 
-  // Sample currency list
   final List<String> _currencyList = ['USD', 'EUR', 'JPY', 'GBP'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Currency Converter'),
+        title: Text('Quick Currency Converter'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -27,8 +27,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text("Currency Converter",
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text("Select currencies and convert!",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(color: Colors.grey[700])),
               SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
@@ -93,10 +96,16 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     );
   }
 
-  void _convertCurrency() {
-    // Placeholder for conversion logic
-    setState(() {
-      _conversionResult = "Conversion result will be displayed here";
-    });
+  void _convertCurrency() async {
+    try {
+      final rates =
+          await CurrencyService().fetchConversionRate(_selectedCurrencyFrom);
+      final rateTo = rates[_selectedCurrencyTo];
+      setState(() {
+        _conversionResult = 'Conversion rate: $rateTo';
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }
